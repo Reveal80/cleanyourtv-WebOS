@@ -16,6 +16,8 @@ function tv(o) {
   fs.writeFileSync(Z + '/comp_algorithm', o.algos || 'lzo lzo-rle [lz4] zstd\n');
   fs.writeFileSync(Z + '/mm_stat', '0 0 0 0 0 0 0 0\n');
   fs.writeFileSync(PROC + '/swaps', HEAD + ESWAP);
+  for (const d of [PROC + '/sys', PROC + '/sys/vm']) if (!fs.existsSync(d)) fs.mkdirSync(d);
+  fs.writeFileSync(PROC + '/sys/vm/page-cluster', '3\n');
   fs.writeFileSync(PROC + '/meminfo', 'MemTotal:        1769072 kB\nMemAvailable:     409468 kB\n');
 }
 function reset() {
@@ -67,6 +69,8 @@ run(async () => {
   ok(+fs.readFileSync(Z + '/disksize', 'utf8') === 512 * 1048576, 'the size written to the device');
   ok(p.calls.join('|') === 'mkswap /dev/zram0|swapon -p 10 /dev/zram0', 'mkswap, then swapon ahead of eswap (priority 10)');
   ok(conf.options().zram === 512 && x.j.setting === 512, 'saved in options.zram');
+  const cl = () => fs.readFileSync(PROC + '/sys/vm/page-cluster', 'utf8').trim();
+  ok(cl() === '0', 'swap reads one page at a time (page-cluster 0), as Android does with zram');
 
   fs.writeFileSync(Z + '/mm_stat', '50765824 18892856 20066304 0 20066304 273 0 871\n');
   x = await call(z, '/api/zram');
@@ -80,6 +84,7 @@ run(async () => {
   x = await call(z, '/api/zram', 'POST', { size: 0 });
   ok(!x.j.on && conf.options().zram === undefined && p.calls.join() === 'swapoff /dev/zram0', 'switched off and forgotten');
   ok(fs.readFileSync(Z + '/reset', 'utf8') === '1', 'the device is reset (its memory freed)');
+  ok(cl() === '3', "and page-cluster is LG's value again");
 
   // at the start of the service (each boot): the saved size is applied once
   fs.writeFileSync(PROC + '/swaps', HEAD + ESWAP);

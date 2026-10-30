@@ -13,6 +13,15 @@ const P = require('./paths'),
 const SIZES = [256, 512, 768, 1024];
 const DEV = '/dev/zram0';
 const PRIORITY = '10'; // ahead of eswap (-2), so idle pages go to RAM first
+// How many pages a swap read brings in at once (2^n). LG sets 3 late in boot (memchute-ready.sh, on rest-boot-done), right for eswap
+// on the eMMC; with zram every page is decompressed, so reading ahead only costs CPU and memory: 0, as Android does with zram.
+const CLUSTER = () => P.PROC + '/sys/vm/page-cluster';
+let clusterBefore = '3';
+function cluster(on) {
+  const now = read(CLUSTER()).trim();
+  if (on && now && now !== '0') clusterBefore = now;
+  if (now) write(CLUSTER(), on ? '0' : clusterBefore);
+}
 
 const read = f => {
   try {
@@ -70,15 +79,20 @@ async function apply(size, run) {
     if (!r.ok) return 'swapoff: ' + (r.err || r.error).trim();
   }
   write(P.ZRAM + '/reset', 1);
-  if (!size) return '';
+  if (!size) {
+    cluster(false);
+    return '';
+  }
   if (/\blz4\b/.test(read(P.ZRAM + '/comp_algorithm'))) write(P.ZRAM + '/comp_algorithm', 'lz4'); // the fastest; else the kernel's default
   if (!write(P.ZRAM + '/disksize', size * 1048576)) return 'zram: the size could not be set';
   let r = await run('mkswap', [DEV]);
   if (r.ok) r = await run('swapon', ['-p', PRIORITY, DEV]);
   if (!r.ok) {
     write(P.ZRAM + '/reset', 1);
+    cluster(false);
     return (r.err || r.error).trim();
   }
+  cluster(true);
   return '';
 }
 
@@ -112,6 +126,8 @@ function create(ctx) {
   function start() {
     const size = saved();
     if (size && status().available && !status().on) change(size).then(e => console.log('zram: ' + (e ? e : size + ' MB on')));
+    // LG's boot sets page-cluster after the service has started: set it again once that is over
+    if (size) setTimeout(() => status().on && cluster(true), 120000).unref();
   }
   return { name: 'zram', paths: ['/api/zram'], handle, start, status };
 }
