@@ -718,6 +718,7 @@ function barMenu(o) {
 }
 /* Customise: how Home looks. What the TV and the service do is in the manager app (More settings...) */
 function customizeMenu() {
+  zramLoad();
   openBuilt(t('Customise'), function () {
     var nh = hiddenIds().length;
     return [
@@ -755,6 +756,10 @@ function customizeMenu() {
           tick();
         },
       },
+      /* a setting of the TV, not of Home, but kept next to the other everyday switches; only where the kernel has zram */
+      zram && zram.available
+        ? { label: t('Compressed memory'), sub: zram.on ? t('%s MB').replace('%s', zram.size) : t('Off'), stay: true, fn: zramMenu }
+        : null,
       { sep: true },
       { label: t('Theme'), stay: true, fn: themeMenu },
       /* only where the theme has slots for cards */
@@ -787,6 +792,77 @@ function customizeMenu() {
     ].filter(function (it) {
       return it;
     });
+  });
+}
+/* Compressed memory (zram, helper/zram.js): LG's kernel has it but leaves it off. The service answers with what the TV has now. */
+var zram = null,
+  zramSize = 0;
+function zramLoad(after) {
+  api('/api/zram').then(
+    function (r) {
+      zram = r;
+      if (after) after();
+      refreshMenu();
+    },
+    function () {}
+  );
+}
+function zramSet(size) {
+  toast(t('Applying...'));
+  api('/api/zram', { size: size }).then(
+    function (r) {
+      zram = r;
+      if (r.error) toast(r.error, true);
+      refreshMenu();
+    },
+    function () {
+      toast(t('Could not save the settings. Try again in a moment.'), true);
+    }
+  );
+}
+function zramMenu() {
+  var z = zram;
+  zramSize = z.size || z.setting || 512;
+  openBuilt(t('Compressed memory'), function () {
+    z = zram;
+    return [
+      {
+        note: t('Keeps idle memory compressed in RAM instead of on the slow built-in storage. LG leaves it off.'),
+      },
+      {
+        label: t('Use compressed memory'),
+        sub: z.on ? t('On') : t('Off'),
+        stay: true,
+        fn: function () {
+          zramSet(z.on ? 0 : zramSize);
+        },
+      },
+      {
+        label: t('Size'),
+        sub: t('%s MB').replace('%s', zramSize),
+        stay: true,
+        fn: function () {
+          var s = z.sizes || [256, 512, 768, 1024];
+          zramSize = s[(s.indexOf(zramSize) + 1) % s.length];
+          if (z.on) zramSet(zramSize);
+          else refreshMenu();
+        },
+      },
+      {
+        label: t('Refresh'),
+        stay: true,
+        fn: function () {
+          zramLoad();
+        },
+      },
+      {
+        note: z.on
+          ? t('%s MB kept in %s MB of memory.').replace('%s', z.stored).replace('%s', z.ram) +
+            ' ' +
+            t('Free memory: %s MB.').replace('%s', z.memAvailable)
+          : t('Free memory: %s MB.').replace('%s', z.memAvailable),
+      },
+    ];
   });
 }
 /* Wallpapers: switched on here and how often the photo changes; the photos are added in the manager (uploads from a phone, Immich) */

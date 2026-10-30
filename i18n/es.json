@@ -689,5 +689,13 @@
  "Uninstall %s?": "¿Desinstalar %s?",
  "Uninstalling %s...": "Desinstalando %s...",
  "%s uninstalled.": "%s desinstalado.",
- "Could not uninstall %s.": "No se pudo desinstalar %s."
+ "Could not uninstall %s.": "No se pudo desinstalar %s.",
+ "Compressed memory": "Memoria comprimida",
+ "%s MB": "%s MB",
+ "Applying...": "Aplicando...",
+ "Use compressed memory": "Usar memoria comprimida",
+ "Refresh": "Actualizar",
+ "%s MB kept in %s MB of memory.": "%s MB guardados en %s MB de memoria.",
+ "Free memory: %s MB.": "Memoria libre: %s MB.",
+ "Keeps idle memory compressed in RAM instead of on the slow built-in storage. LG leaves it off.": "Guarda comprimida en la RAM la memoria que no se usa, en vez de en el almacenamiento interno, que es lento. LG la deja desactivada."
 }

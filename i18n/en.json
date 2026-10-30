@@ -733,5 +733,13 @@
  "Power off completely?": "Power off completely?",
  "Power off completely": "Power off completely",
  "The next start is slower, and Wake-on-LAN no longer wakes the TV.": "The next start is slower, and Wake-on-LAN no longer wakes the TV.",
- "Powering off...": "Powering off..."
+ "Powering off...": "Powering off...",
+ "Compressed memory": "Compressed memory",
+ "%s MB": "%s MB",
+ "Applying...": "Applying...",
+ "Use compressed memory": "Use compressed memory",
+ "Refresh": "Refresh",
+ "%s MB kept in %s MB of memory.": "%s MB kept in %s MB of memory.",
+ "Free memory: %s MB.": "Free memory: %s MB.",
+ "Keeps idle memory compressed in RAM instead of on the slow built-in storage. LG leaves it off.": "Keeps idle memory compressed in RAM instead of on the slow built-in storage. LG leaves it off."
 }

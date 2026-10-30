@@ -684,5 +684,13 @@
     "Uninstall %s?": "Vols desinstal·lar %s?",
     "Uninstalling %s...": "S'està desinstal·lant %s...",
     "%s uninstalled.": "S'ha desinstal·lat %s.",
-    "Could not uninstall %s.": "No s'ha pogut desinstal·lar %s."
+    "Could not uninstall %s.": "No s'ha pogut desinstal·lar %s.",
+    "Compressed memory": "Memòria comprimida",
+    "%s MB": "%s MB",
+    "Applying...": "S'està aplicant...",
+    "Use compressed memory": "Fes servir memòria comprimida",
+    "Refresh": "Actualitza",
+    "%s MB kept in %s MB of memory.": "%s MB desats en %s MB de memòria.",
+    "Free memory: %s MB.": "Memòria lliure: %s MB.",
+    "Keeps idle memory compressed in RAM instead of on the slow built-in storage. LG leaves it off.": "Desa comprimida a la RAM la memòria que no s'utilitza, en lloc de l'emmagatzematge intern, que és lent. LG la deixa desactivada."
 }

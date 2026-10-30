@@ -15,6 +15,12 @@ yours to change.
 - **Open apps.** Optionally a green dot on the tile of every app that is open, as on the active input in the Inputs list: off by
   default, **Customise** > **Mark running apps** switches it on, in the launcher and in the Inputs picker. Back on the home screen lists
   the open apps to close them (see [Running apps](#running-apps)).
+- **Compressed memory.** **Customise** > **Compressed memory** keeps the memory that apps are not using compressed in RAM (zram, lz4)
+  instead of on the TV's slower built-in storage (LG's own swap, `eswap`). The kernel has it (checked on webOS 22), but LG leaves
+  it off; Android TV turns it on by default. It helps TVs with little memory, where most of it is reserved for video and the swap on the
+  eMMC fills up. Choose a size (256 to 1024 MB; 512 MB is a good start) and switch it on: the menu shows how much it keeps and how much
+  memory that takes. The service switches it on again at every start; switching it off (or a reboot without CleanYourTV) leaves the TV
+  as LG ships it. The row only appears where the TV has zram.
 
 ## Keys
 
